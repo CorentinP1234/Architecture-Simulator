@@ -12,6 +12,7 @@ public class ALU {
         this.t2 = new Register("t2");
         this.t3 = new Register("t3");
     }
+    // TEST
 
     // 1. LDA <reg1> <reg2>/<var>/<const>
     // Load register reg1 with the contents of either the contents of reg2, or the memory var or a constant
