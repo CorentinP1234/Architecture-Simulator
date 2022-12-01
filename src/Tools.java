@@ -1,13 +1,15 @@
+import java.util.Objects;
+
 public class Tools {
-    public static String convertDecimalTo32BitString(int decimalValue) {
+    public static String convertDecToBin32(int decimalValue) {
 
         // Convert decimal integer in binary string
-        String binaryString = Integer.toBinaryString(decimalValue);
+        String binary = Integer.toBinaryString(decimalValue);
 
         // Get a 32-bit format by adding 0 before the first significant bit
-        String formattedBinaryString = String.format("%32s", binaryString).replace(" ", "0");
+        String formattedBinary = String.format("%32s", binary).replace(" ", "0");
 
-        return formattedBinaryString;
+        return formattedBinary;
     }
     public static String twosComplement(String binaryString) {
 
@@ -58,12 +60,13 @@ public class Tools {
         return res.toString();
     }
     public static String binarySubtraction32bit(String binaryString1, String binaryString2) {
+        // binaryString1 - binaryString2
         String tmpString = twosComplement(binaryString2);
         String res = binaryAddition32bit(binaryString1, tmpString);
         return res;
     }
 
-    public static int binaryStringToDecimal(String binaryString) {
+    public static int convertBin32ToDec(String binaryString) {
         String tmpBinaryString;
         boolean isNegative = false;
 
@@ -89,5 +92,89 @@ public class Tools {
         }
 
         return value;
+    }
+    public static String AndOperation(String bin1, String bin2) {
+        StringBuilder stringBuilder = new StringBuilder(32);
+
+        for (int i = 0; i < 32; i++) {
+            if(bin1.charAt(i) == '1' && bin2.charAt(i) == '1')
+                stringBuilder.append('1');
+            else {
+                stringBuilder.append('0');
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public static String OrOperation(String bin1, String bin2) {
+         StringBuilder stringBuilder = new StringBuilder(32);
+
+        for (int i = 0; i < 32; i++) {
+            if(bin1.charAt(i) == '1' || bin2.charAt(i) == '1')
+                stringBuilder.append('1');
+            else {
+                stringBuilder.append('0');
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public static boolean isBigger(String bin1, String bin2) {
+        int value1 = convertBin32ToDec(bin1);
+        int value2 = convertBin32ToDec(bin2);
+
+        return value1 > value2;
+    }
+
+    public static boolean isSmaller(String bin1, String bin2) {
+        int value1 = convertBin32ToDec(bin1);
+        int value2 = convertBin32ToDec(bin2);
+
+        return value1 < value2;
+    }
+    public static boolean isRegisterName(String str) {
+        return Objects.equals(str, "T0") || Objects.equals(str, "T1")
+                || Objects.equals(str, "T2") || Objects.equals(str, "T3");
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isVariableInMemory(String param2, ALU alu) {
+        if(alu.memory.NameToAddressMap.containsKey(param2)) {
+                return true;
+        }
+        else {
+            System.out.println("Error: variable does not exist:");
+            System.out.println("Variable: " + param2);
+            System.exit(1);
+            return false;
+        }
+    }
+
+    public static Register selectRegisterByName(String registerName, ALU alu) {
+        switch (registerName) {
+            case "T0":
+                return alu.t0;
+            case "T1":
+                return alu.t1;
+            case "T2":
+                return alu.t2;
+            case "T3":
+                return alu.t3;
+            default:
+                System.out.println("Error: in selectRegisterByName: should not happen");
+                System.exit(0);
+                // For warning issues
+                return alu.t0;
+        }
     }
 }

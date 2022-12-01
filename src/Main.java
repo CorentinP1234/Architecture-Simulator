@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -19,22 +20,19 @@ public class Main {
         // Init Memory for variable
         Memory memory = new Memory();
 
+
+
         // Init ALU
         ALU alu = new ALU();
         alu.memory = memory;
         alu.stack = stack;
-
-        // Registers
-        Register t0 = alu.t0;
-        Register t1 = alu.t1;
-        Register t2 = alu.t2;
-        Register t3 = alu.t3;
+        alu.labelToCodeLine = new HashMap<>();
 
         // Program Counter
         int PC = 0;
 
         // Start the execution
-        // startExecution(codeLines, alu, PC, memory, stack);
+         startExecution(codeLines, alu, PC, memory);
 
         // TESTING
         // TEST_memory();
@@ -69,12 +67,19 @@ public class Main {
 
         return codeLines;
     }
+    public static void printVaraible(Memory memory) {
+        // Parcour le dic
+        // Regarde aux addresses
+        // bin to dec
+        // affiche les values
+    }
 
-    public static void startExecution(ArrayList<String> codeLines, ALU alu, int PC, Memory memory, Stack stack) {
-        // Algo temporaire
+    public static void startExecution(ArrayList<String> codeLines, ALU alu, int PC, Memory memory) {
         boolean lines_remaining = true;
         boolean DATA_SECTION = false;
         boolean CODE_SECTION = false;
+
+        boolean prompt = true;
 
         while(lines_remaining) {
             String line = codeLines.get(PC);
@@ -83,16 +88,21 @@ public class Main {
                 DATA_SECTION = false;
                 CODE_SECTION = true;
                 System.out.println("Data section finished");
-                memory.print(128);
                 System.out.println("Starting code section..");
             }
 
             if (DATA_SECTION) {
-                memory.writeVariable(line);
+                memory.writeVariableFromCodeLine(line);
             }
 
             if (CODE_SECTION) {
-                ;
+                PC = code_section(line, alu, PC);
+                if (prompt) {
+                    alu.t0.print();
+                    alu.t1.print();
+                    alu.t2.print();
+                    alu.t3.print();
+                }
             }
 
             if (Objects.equals(line, "#DATA")) {
@@ -109,19 +119,241 @@ public class Main {
         }
     }
 
+    //TODO
+    public static void printVariable() {
+
+    }
+
+
+
+
+    public static int code_section(String line, ALU alu, int PC) {
+        String[] lineElements = line.split(" ");
+
+        // Check for label
+        if (lineElements.length == 1) {
+
+            // Label example : "LOOP:"
+            int insctructionLength = lineElements[0].length();
+
+            // Remove ":" at the end
+            String LABEL = lineElements[0].substring(0, insctructionLength-1);
+
+            // Store in Map
+            alu.labelToCodeLine.put(LABEL, PC);
+        }
+
+        String instruction = lineElements[0];
+
+        switch (instruction) {
+            case "LDA":
+                if (lineElements.length == 3) {
+                    Instructions.LDA(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "STR":
+                if (lineElements.length == 3) {
+                    Instructions.STR(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "PUSH":
+                if (lineElements.length == 2) {
+                    Instructions.PUSH(lineElements[1], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "POP":
+                if (lineElements.length == 2) {
+                    Instructions.POP(lineElements[1], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "AND":
+                if (lineElements.length == 3) {
+                    Instructions.AND(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "OR":
+                if (lineElements.length == 3) {
+                    Instructions.OR(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "NOT":
+                if (lineElements.length == 2) {
+                    Instructions.NOT(lineElements[1], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "ADD":
+                if (lineElements.length == 3) {
+                    Instructions.ADD(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "SUB":
+                if (lineElements.length == 3) {
+                    Instructions.SUB(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "DIV":
+                if (lineElements.length == 3) {
+                    Instructions.DIV(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "MUL":
+                if (lineElements.length == 3) {
+                    Instructions.MUL(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "MOD":
+                if (lineElements.length == 3) {
+                    Instructions.MOD(lineElements[1], lineElements[2], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "INC":
+                if (lineElements.length == 2) {
+                    Instructions.INC(lineElements[1], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "DEC":
+                if (lineElements.length == 2) {
+                    Instructions.DEC(lineElements[1], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "BEQ":
+                if (lineElements.length == 4) {
+                    return Instructions.BEQ(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "BNE":
+                if (lineElements.length == 4) {
+                    return Instructions.BNE(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "BBG":
+                if (lineElements.length == 4) {
+                    return Instructions.BBG(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "BSM":
+                if (lineElements.length == 4) {
+                    return Instructions.BSM(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+
+            case "JMP":
+                if (lineElements.length == 2) {
+                    return Instructions.JMP(lineElements[1], alu);
+                }
+                else {
+                    System.out.println("Error: invalid number of argument:");
+                    System.out.println("In line: " + line);
+                }
+                break;
+        }
+        return PC;
+    }
+
     // TEST functions ------------------------------------
     public  static void TEST_memory() {
         Memory memory = new Memory();
         String codeLine = "A 10";
         String codeLine2 = "B 127";
-        memory.writeVariable(codeLine);
-        memory.writeVariable(codeLine2);
+        memory.writeVariableFromCodeLine(codeLine);
+        memory.writeVariableFromCodeLine(codeLine2);
         memory.print(100);
     }
     public static void TEST_twosComplement() {
+        int numberToTest = 127;
+
         Register reg1 = new Register("reg1");
-        reg1.setFromDecimal(127);
-        String binaryString = reg1.getBinaryString();
+        reg1.write(Tools.convertDecToBin32(numberToTest));
+        String binaryString = reg1.read();
         String complement = Tools.twosComplement(binaryString);
         System.out.println(binaryString);
         System.out.println(complement);
@@ -134,16 +366,16 @@ public class Main {
         int number2 = 127;
 
         Register reg1 = new Register("reg1");
-        reg1.setFromDecimal(number1);
+        reg1.write(Tools.convertDecToBin32(number1));
         Register reg2 = new Register("reg2");
-        reg2.setFromDecimal(number2);
+        reg1.write(Tools.convertDecToBin32(number2));
 
         reg1.print();
         reg2.print();
 
         System.out.println();
 
-        String res = Tools.binaryAddition32bit(reg1.getBinaryString(), reg2.getBinaryString());
+        String res = Tools.binaryAddition32bit(reg1.read(), reg2.read());
         System.out.println("res: " + res);
     }
 
@@ -155,17 +387,17 @@ public class Main {
         int number2 = 128;
 
         Register reg1 = new Register("reg1");
-        reg1.setFromDecimal(number1);
+        reg1.write(Tools.convertDecToBin32(number1));
         Register reg2 = new Register("reg2");
-        reg2.setFromDecimal(number2);
+        reg1.write(Tools.convertDecToBin32(number2));
 
         reg1.print();
         reg2.print();
 
         System.out.println();
 
-        String res = Tools.binarySubtraction32bit(reg1.getBinaryString(), reg2.getBinaryString());
-        System.out.println(number1 + " - " + number2 + " = " + Tools.binaryStringToDecimal(res) + String.format("(expected %d)", number1 - number2));
+        String res = Tools.binarySubtraction32bit(reg1.read(), reg2.read());
+        System.out.println(number1 + " - " + number2 + " = " + Tools.convertBin32ToDec(res) + String.format("(expected %d)", number1 - number2));
         System.out.println("res: " + res);
     }
 }

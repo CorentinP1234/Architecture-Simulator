@@ -32,23 +32,19 @@ public class Register {
         }
         System.out.print("\n");
     }
-    public void setFromDecimal(int decimalNumber) {
 
-        String binaryString = Tools.convertDecimalTo32BitString(decimalNumber);
-
-        // Write in bitArray
-        for(int i = 0; i < 32; i++) {
-            char bitCharacter = binaryString.charAt(i);
-            int bitValue = Character.getNumericValue(bitCharacter);
-            bitArray[i] = bitValue;
-        }
-    }
-
-    public String getBinaryString() {
+    public String read() {
         StringBuilder res = new StringBuilder();
         for(int i = 0; i < 32; i++) {
             res.append(bitArray[i]);
         }
         return res.toString();
+    }
+    public void write(String binaryString) {
+        for(int i = 0; i < 32; i++) {
+            char bitCharacter = binaryString.charAt(i);
+            int bitValue = Character.getNumericValue(bitCharacter);
+            bitArray[i] = bitValue;
+        }
     }
 }

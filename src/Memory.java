@@ -14,7 +14,7 @@ public class Memory {
         this.byteArray = new int[8192][8];
     }
 
-    public void writeVariable(String codeLine) {
+    public void writeVariableFromCodeLine(String codeLine) {
 
         // Extract variable name and value from the code line
         String[] elements = codeLine.split(" ");
@@ -22,10 +22,18 @@ public class Memory {
             System.out.println("Error reading variable: incorrect format : " + codeLine);
         }
         String varName = elements[0];
+
+        // Check if variableName is a register name
+        // If yes stop execution
+        if (Tools.isRegisterName(varName)) {
+            System.out.println("Error: register name are reserved:");
+            System.out.println("In line: " + codeLine);
+        }
+
         int value = Integer.parseInt(elements[1]);
 
         // Compute the binary representation
-        String binaryString = Tools.convertDecimalTo32BitString(value);
+        String binaryString = Tools.convertDecToBin32(value);
 
         // Write variable in memory
         int byteIndex = 0;
@@ -43,12 +51,12 @@ public class Memory {
         writingPointer += 4;
     }
 
-    public String getBinaryStringFromName(String Name) {
+    public String readFromName(String Name) {
         int address = NameToAddressMap.get(Name);
-        return getStringBinaryFromAddress(address);
+        return readFromAddress(address);
 
     }
-    public String getStringBinaryFromAddress(int address) {
+    public String readFromAddress(int address) {
         StringBuilder binaryString = new StringBuilder();
         int byteIndex = 0;
         for (int i = 0; i < 32; i++) {
