@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -5,7 +6,12 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
-        ArrayList<String> codeLines = FileReader.readFile_withoutComments("first_file.txt");
+        // file selector
+        String fileToRun = FileReader.fileSelector();
+        ArrayList<String> codeLines = FileReader.readFile_withoutComments(fileToRun);
+
+        // Manual file selection
+        // ArrayList<String> codeLines = FileReader.readFile_withoutComments("first_file.txt");
 
         ALU alu = new ALU();
         alu.memory = new Memory();
@@ -75,7 +81,7 @@ public class Main {
 
             // Stop execution when instruction HLT is found, print the command prompt
             if (Objects.equals(line, "HLT")) {
-                System.out.println("> Code section finished\n");
+                System.out.println("> HLT\n");
                 alu.memory.printAllVar();
                 promptCommands("", alu);
                 lines_remaining = false;
@@ -187,109 +193,111 @@ public class Main {
 
         switch (instruction) {
             case "LDA":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.LDA(lineElements[1], lineElements[2], alu);
                 break;
 
             case "STR":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.STR(lineElements[1], lineElements[2], alu);
                 break;
 
             case "PUSH":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
                     Instructions.PUSH(lineElements[1], alu);
                 break;
 
             case "POP":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
                     Instructions.POP(lineElements[1], alu);
                 break;
 
             case "AND":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.AND(lineElements[1], lineElements[2], alu);
                 break;
 
             case "OR":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.OR(lineElements[1], lineElements[2], alu);
                 break;
 
             case "NOT":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
                     Instructions.NOT(lineElements[1], alu);
                 break;
 
             case "ADD":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.ADD(lineElements[1], lineElements[2], alu);
                 break;
 
             case "SUB":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.SUB(lineElements[1], lineElements[2], alu);
                 break;
 
             case "DIV":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.DIV(lineElements[1], lineElements[2], alu);
                 break;
 
             case "MUL":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.MUL(lineElements[1], lineElements[2], alu);
                 break;
 
             case "MOD":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
                     Instructions.MOD(lineElements[1], lineElements[2], alu);
                 break;
 
             case "INC":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
                     Instructions.INC(lineElements[1], alu);
                 break;
 
             case "DEC":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
                     Instructions.DEC(lineElements[1], alu);
                 break;
 
             case "BEQ":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
                     return Instructions.BEQ(lineElements[1], lineElements[2], lineElements[3], PC, alu);
                 break;
 
             case "BNE":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
                     return Instructions.BNE(lineElements[1], lineElements[2], lineElements[3], PC, alu);
                 break;
 
             case "BBG":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
                     return Instructions.BBG(lineElements[1], lineElements[2], lineElements[3], PC, alu);
                 break;
 
             case "BSM":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
                     return Instructions.BSM(lineElements[1], lineElements[2], lineElements[3], PC, alu);
                 break;
 
             case "JMP":
-                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line)) {
                     return Instructions.JMP(lineElements[1], alu);
+                }
                 break;
         }
         return PC;
     }
 
-    public static boolean isNumberOfArgumentInvalid(boolean comparison, String line) {
+    public static boolean isNumberOfArgumentValid(boolean comparison, String line) {
         if (comparison)
             return true;
         else {
-            System.out.println("Error: invalid number of argument:");
+            System.out.println("\nError: invalid number of argument:");
             System.out.println("In line: " + line);
+            System.exit(1);
             return false;
         }
     }
