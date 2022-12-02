@@ -175,7 +175,6 @@ public class Tools {
             case "T3":
                 return alu.t3;
             default:
-
                 return null;
         }
     }

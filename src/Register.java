@@ -14,21 +14,6 @@ public class Register {
         }
     }
 
-    public void print() {
-
-        // Get decimal value from the array of bits
-        StringBuilder binaryString = new StringBuilder();
-        for(int i = 0; i < 32; i++) {
-           binaryString.append(bitArray[i]);
-        }
-        int decimalValue = Tools.convertBin32ToDec(binaryString.toString());
-
-        // Print the register name and decimal value
-        System.out.println("Register " + registerName + " contains " + decimalValue + " : " + binaryString.toString());
-
-        System.out.print("\n");
-    }
-
     public String read() {
         StringBuilder res = new StringBuilder();
         for(int i = 0; i < 32; i++) {
@@ -36,6 +21,7 @@ public class Register {
         }
         return res.toString();
     }
+
     public void write(String binaryString) {
         for(int i = 0; i < 32; i++) {
             char bitCharacter = binaryString.charAt(i);
@@ -43,4 +29,18 @@ public class Register {
             bitArray[i] = bitValue;
         }
     }
+
+    public void print() {
+
+        // Get decimal value from the array of bits
+        String binaryString = read();
+        int decimalValue = Tools.convertBin32ToDec(binaryString);
+
+        // Print the register name and decimal value
+        System.out.println("Register " + registerName + " contains " + decimalValue + " : " + binaryString);
+        System.out.print("\n");
+    }
+
+
+
 }

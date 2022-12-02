@@ -7,6 +7,7 @@ public class Instructions {
         if (Tools.isRegisterName(param1)) {
 
             reg1 = Tools.selectRegisterByName(param1, alu);
+
             if (Tools.isRegisterName(param2)) {
                 Register reg2 = Tools.selectRegisterByName(param2, alu);
                 alu.LDA(reg1, reg2);

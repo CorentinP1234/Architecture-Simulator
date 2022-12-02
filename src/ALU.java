@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -10,7 +11,7 @@ public class ALU {
     public Memory memory = null;
     public Stack stack = null;
 
-    public Map<String, Integer> labelToCodeLine;
+    public Map<String, Integer> labelToCodeLine = new HashMap<>();
     ALU() {
         this.t0 = new Register("t0");
         this.t1 = new Register("t1");
@@ -22,10 +23,6 @@ public class ALU {
     //    Load register reg1 with the contents of either the contents of reg2, or the memory var or a constant
     //    const. Memory regions loads (load into a variable, for instance) are NOT ALLOWED.
 
-    // !!
-    // Pas sur de bien comprendre cette phrase:
-    // Memory regions loads (load into a variable, for instance) are NOT ALLOWED.
-    // !!
     public void LDA(Register reg1, Register reg2) {
 
         // Copy each bit of reg2 into reg1
@@ -56,11 +53,6 @@ public class ALU {
     //    Store in the memory position referred by var the value of register reg or a constant const. Register
     //    stores (store into register t0, for instance) are NOT ALLOWED.
 
-    // !!
-    // Pas sur de bien comprendre cette phrase:
-    // Register stores (store into register t0, for instance) are NOT ALLOWED.
-    // !!
-
     public void STR(String variableName, Register reg) {
 
         // read the binary number from the register
@@ -72,7 +64,7 @@ public class ALU {
 
     public void STR(String variableName, int constant) {
 
-        // Convert the decimal consant to binary
+        // Convert the decimal constant to binary
         String binConstant = Tools.convertDecToBin32(constant);
 
         // Write the constant at the address of the variable in memory
@@ -274,7 +266,7 @@ public class ALU {
         // SUB operation (variable - reg1)
         String result = Tools.binarySubtraction32bit(binVariable, reg1.read());
 
-        // Write the reulst on register 1
+        // Write the result on register 1
         reg1.write(result);
     }
     public void SUB(Register reg1, int constant) {

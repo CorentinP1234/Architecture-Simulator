@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Memory {
     public int[][] byteArray;
@@ -14,12 +15,13 @@ public class Memory {
         this.byteArray = new int[8192][8];
     }
 
-    public void writeVariableFromCodeLine(String codeLine) {
+    public void writeFromCodeLine(String codeLine) {
 
         // Extract variable name and value from the code line
         String[] elements = codeLine.split(" ");
-        if (elements.length > 2) {
-            System.out.println("Error reading variable: incorrect format : " + codeLine);
+        if (elements.length != 2 ) {
+            System.out.println("Error reading variable: format <var> <value>: " + codeLine);
+            System.exit(1);
         }
         String varName = elements[0];
 
@@ -28,6 +30,7 @@ public class Memory {
         if (Tools.isRegisterName(varName)) {
             System.out.println("Error: register name are reserved:");
             System.out.println("In line: " + codeLine);
+            System.exit(1);
         }
 
         int value = Integer.parseInt(elements[1]);
@@ -51,15 +54,19 @@ public class Memory {
         writingPointer += 4;
     }
 
-    public String readFromName(String Name) {
-        int address = NameToAddressMap.getOrDefault(Name, -1);
+    public String readFromName(String varName) {
+        // Get address of the variable, if there is no such variable return an empty string
+        int address = NameToAddressMap.getOrDefault(varName, -1);
         if (address == -1) {
             return "";
         }
+        // Return the binary representation of the variable
         return readFromAddress(address);
-
     }
+
     public String readFromAddress(int address) {
+
+        // Temporary string array to build the binary number
         StringBuilder binaryString = new StringBuilder();
         int byteIndex = 0;
         for (int i = 0; i < 32; i++) {
@@ -67,18 +74,25 @@ public class Memory {
             if(i%8 == 7)
                 byteIndex++;
         }
+
+        // Return the binary number
         return binaryString.toString();
     }
+
     public void setValueFromName(String binaryString, String Name) {
         int address = NameToAddressMap.get(Name);
         setValueFromAddress(binaryString, address);
     }
+
     public void setValueFromAddress(String binaryString, int address) {
         int byteIndex = 0;
         for (int i = 0; i < 32; i++) {
-            byteArray[address + byteIndex][i%8] = binaryString.charAt(i);
+            byteArray[address + byteIndex][i%8] = Character.getNumericValue(binaryString.charAt(i));
+            if (i%8 == 7)
+                byteIndex++;
         }
     }
+
     public void printBits(int numberOfBits) {
         // Print memory
         int byteIndex = 0;
@@ -97,11 +111,17 @@ public class Memory {
 
         // Print NameToAddressMap
         System.out.println("Variable Addresses (in Bytes) : ");
-        System.out.println(NameToAddressMap);
+        for(Map.Entry<String, Integer> entry : NameToAddressMap.entrySet()) {
+            String Name = entry.getKey();
+            int address = entry.getValue();
+            System.out.println(Name + " stored at " + (address + 1));
+        }
+        System.out.println();
         System.out.println();
     }
 
     public void printAllVar() {
+        // Loop for all key and value
         for (Map.Entry<String, Integer> entry : NameToAddressMap.entrySet()) {
             String varName = entry.getKey();
             int address = entry.getValue();
@@ -110,6 +130,17 @@ public class Memory {
             int decimalValue = Tools.convertBin32ToDec(bin);
             System.out.println("VAR " + varName + " = " + decimalValue);
         }
-        System.out.println();
+    }
+
+    public void printVariable(String variable) {
+        String bin = readFromName(variable);
+        if (Objects.equals(bin, "")) {
+            throw new IllegalArgumentException();
+        } else {
+            int decimalValue = Tools.convertBin32ToDec(bin);
+
+            System.out.println("VAR " + variable + " = " + decimalValue + " : " + bin + "\n");
+        }
+
     }
 }

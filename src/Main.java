@@ -1,133 +1,87 @@
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
-        // Questions:
-        // Est ce que les registres sont signés ou non signés ?
+        ArrayList<String> codeLines = FileReader.readFile_withoutComments("first_file.txt");
 
-        // Read file
-        ArrayList<String> codeLines_withComments = readFile("first_file.txt");
-        ArrayList<String> codeLines = removeComments(codeLines_withComments);
-
-        // Init Stack
-        Stack stack = new Stack();
-
-        // Init Memory for variable
-        Memory memory = new Memory();
-
-
-
-        // Init ALU
         ALU alu = new ALU();
-        alu.memory = memory;
-        alu.stack = stack;
-        alu.labelToCodeLine = new HashMap<>();
+        alu.memory = new Memory();
+        alu.stack = new Stack();
 
-        // Program Counter
         int PC = 0;
 
-        // Start the execution
-         startExecution(codeLines, alu, PC, memory);
+        startExecution(codeLines, alu, PC);
 
-        // TESTING
-        // TEST_memory();
-        // TEST_twosComplement();
-        // TEST_binaryAddition();
-        // TEST_binarySubtraction();
+        // Comment est implemente la Stack ?
+        // Voir: - Stack.bitArray
+        //       - Stack.push()
+        //       - Stack.pop()
+
+        // Comment est implemente la memoire ?
+        // Voir: - Memory.byteArray
+        //       - Memory.writeFromCodeLine()
+        //       - Memory.readFromName()
+
+        // Comment sont implemente les registres ?
+        // Voir: - Register.bitArray
+        //       - Register.write()
+        //       - Register.read()
     }
 
-
-    public static ArrayList<String> readFile(String fileName) throws FileNotFoundException {
-
-        // Stores each line in an ArrayList "lines"
-        File file = new File(fileName);
-        Scanner scanner = new Scanner(file);
-        ArrayList<String> lines = new ArrayList<>();
-        while(scanner.hasNextLine()) {
-            lines.add(scanner.nextLine());
-        }
-
-        return lines;
-    }
-
-    public static ArrayList<String> removeComments(ArrayList<String> codeLines_withComments){
-
-        // Modify the ArrayList argument codeLines_withComments by removing each line beginning with '!'
-        int number_of_lines = codeLines_withComments.size();
-        ArrayList<String> codeLines = new ArrayList<>(number_of_lines);
-        for (String line : codeLines_withComments) {
-            if (line.charAt(0) != '!')
-                codeLines.add(line);
-        }
-
-        return codeLines;
-    }
-    public static boolean printVaraible(String variable, Memory memory) {
-        String bin = memory.readFromName(variable);
-        if (Objects.equals(bin, "")) {
-            // no Var with this name
-            return true;
-        } else {
-            int decimalValue = Tools.convertBin32ToDec(bin);
-
-            System.out.println("VAR " + variable + " = " + decimalValue + " : " + bin + "\n");
-            return false;
-        }
-
-    }
-
-    public static void startExecution(ArrayList<String> codeLines, ALU alu, int PC, Memory memory) {
+    public static void startExecution(ArrayList<String> codeLines, ALU alu, int PC) {
         boolean lines_remaining = true;
         boolean DATA_SECTION = false;
         boolean CODE_SECTION = false;
 
-        boolean allowCommands = true;
+        boolean commandPrompt = true;
 
         while(lines_remaining) {
+
+            // Fetch line corresponding to the PC
             String line = codeLines.get(PC);
 
+            // Enter #CODE section and print all variable from #DATA section
             if (Objects.equals(line, "#CODE")) {
                 DATA_SECTION = false;
                 CODE_SECTION = true;
-                memory.printAllVar();
-                System.out.println("Data section finished\n");
-                System.out.println("Starting code section..\n");
+                alu.memory.printAllVar();
+                System.out.println("#DATA section finished\n");
+                System.out.println("Starting #CODE section..");
                 PC++;
                 continue;
             }
 
+            // When in #DATA section, write variable in memory
             if (DATA_SECTION) {
-                memory.writeVariableFromCodeLine(line);
+                alu.memory.writeFromCodeLine(line);
             }
 
-
-
+            // When in #CODE section, perform the instruction and print the command prompt
             if (CODE_SECTION && !Objects.equals(line, "HLT")) {
                 PC = code_section(line, alu, PC);
-                if (allowCommands) {
-                   allowCommands = promptCommands(line, alu);
+                if (commandPrompt) {
+                   commandPrompt = promptCommands(line, alu);
                 }
             }
 
+            // Enter #DATA section
             if (Objects.equals(line, "#DATA")) {
-                System.out.println("Starting data section..");
-                memory.printAllVar();
+                System.out.println("Starting #DATA section..");
                 DATA_SECTION = true;
             }
 
-            // Stop condition
+            // Stop execution when instruction HLT is found, print the command prompt
             if (Objects.equals(line, "HLT")) {
                 System.out.println("> Code section finished\n");
-                memory.printAllVar();
+                alu.memory.printAllVar();
                 promptCommands("", alu);
                 lines_remaining = false;
             }
 
+            // Increment PC after each instruction
             PC++;
         }
     }
@@ -135,19 +89,34 @@ public class Main {
     public static boolean promptCommands(String line, ALU alu) {
         Scanner scanner = new Scanner(System.in);
         boolean repeatPrompt = true;
+
+        // Repeat prompt printing until "next" or "end" command
         do {
+
+            // Print the code line above the prompt
             if (!Objects.equals(line, "")) {
                 System.out.print("> ");
                 System.out.println(line);
             }
+
+            // Print prompt
             System.out.println("\nCommands: print <reg>, printVar <var>,memory <bits>, \"next\" or \"end\" to finish execution");
             System.out.print(">>");
+
+            // Take the command
             String input = scanner.nextLine();
             System.out.println();
+
+            // Split the command by word
             String[] lineElement = input.split(" ");
+
+            // Select command
             switch (lineElement[0]) {
 
+                // Print register
                 case "print":
+
+                    // Select register, return null if invalid register name
                     Register reg = Tools.selectRegisterByName(lineElement[1], alu);
                     if (reg == null) {
                         System.out.println("Error: wrong register name:");
@@ -157,12 +126,18 @@ public class Main {
                     }
                     break;
 
+                // Print variable
                 case "printVar":
-                    if (printVaraible(lineElement[1], alu.memory)) {
+                    try {
+                        alu.memory.printVariable(lineElement[1]);
+                    }
+                    // If there is no variable with this name, print warning
+                    catch(IllegalArgumentException ie) {
                         System.out.println("Wrong variable name");
                     }
                     break;
 
+                // Print region in memory, specify number of bits to read
                 case "memory":
                     int numberOfBits;
                     try {
@@ -173,11 +148,13 @@ public class Main {
                     }
                     break;
 
+                // Go to next instruction
                 case "next":
                 case "n":
                     repeatPrompt = false;
                     break;
 
+                // Finish executing with no prompt
                 case "end":
                     return false;
 
@@ -189,280 +166,131 @@ public class Main {
         return true;
     }
 
-
-
-
     public static int code_section(String line, ALU alu, int PC) {
         String[] lineElements = line.split(" ");
+        int numberOfArgument = lineElements.length - 1;
 
         // Check for label
-        if (lineElements.length == 1) {
+        if (numberOfArgument == 0) {
 
             // Label example : "LOOP:"
-            int insctructionLength = lineElements[0].length();
+            int labelLength = lineElements[0].length();
 
             // Remove ":" at the end
-            String LABEL = lineElements[0].substring(0, insctructionLength-1);
+            String label = lineElements[0].substring(0, labelLength-1);
 
             // Store in Map
-            alu.labelToCodeLine.put(LABEL, PC);
+            alu.labelToCodeLine.put(label, PC);
         }
 
         String instruction = lineElements[0];
 
         switch (instruction) {
             case "LDA":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.LDA(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "STR":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.STR(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "PUSH":
-                if (lineElements.length == 2) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
                     Instructions.PUSH(lineElements[1], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "POP":
-                if (lineElements.length == 2) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
                     Instructions.POP(lineElements[1], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "AND":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.AND(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "OR":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.OR(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "NOT":
-                if (lineElements.length == 2) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
                     Instructions.NOT(lineElements[1], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "ADD":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.ADD(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "SUB":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.SUB(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "DIV":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.DIV(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "MUL":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.MUL(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "MOD":
-                if (lineElements.length == 3) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 2), line))
                     Instructions.MOD(lineElements[1], lineElements[2], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "INC":
-                if (lineElements.length == 2) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
                     Instructions.INC(lineElements[1], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "DEC":
-                if (lineElements.length == 2) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
                     Instructions.DEC(lineElements[1], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "BEQ":
-                if (lineElements.length == 4) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
                     return Instructions.BEQ(lineElements[1], lineElements[2], lineElements[3], PC, alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "BNE":
-                if (lineElements.length == 4) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
                     return Instructions.BNE(lineElements[1], lineElements[2], lineElements[3], PC, alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "BBG":
-                if (lineElements.length == 4) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
                     return Instructions.BBG(lineElements[1], lineElements[2], lineElements[3], PC, alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "BSM":
-                if (lineElements.length == 4) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 3), line))
                     return Instructions.BSM(lineElements[1], lineElements[2], lineElements[3], PC, alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
 
             case "JMP":
-                if (lineElements.length == 2) {
+                if (isNumberOfArgumentInvalid((numberOfArgument == 1), line))
                     return Instructions.JMP(lineElements[1], alu);
-                }
-                else {
-                    System.out.println("Error: invalid number of argument:");
-                    System.out.println("In line: " + line);
-                }
                 break;
         }
         return PC;
     }
 
-    // TEST functions ------------------------------------
-    public  static void TEST_memory() {
-        Memory memory = new Memory();
-        String codeLine = "A 10";
-        String codeLine2 = "B 127";
-        memory.writeVariableFromCodeLine(codeLine);
-        memory.writeVariableFromCodeLine(codeLine2);
-        memory.printBits(100);
-    }
-    public static void TEST_twosComplement() {
-        int numberToTest = 127;
-
-        Register reg1 = new Register("reg1");
-        reg1.write(Tools.convertDecToBin32(numberToTest));
-        String binaryString = reg1.read();
-        String complement = Tools.twosComplement(binaryString);
-        System.out.println(binaryString);
-        System.out.println(complement);
-    }
-    public static void TEST_binaryAddition() {
-        System.out.println("TEST_binaryAddition");
-        // number1 + number2
-        // Change number to test
-        int number1 = 1;
-        int number2 = 127;
-
-        Register reg1 = new Register("reg1");
-        reg1.write(Tools.convertDecToBin32(number1));
-        Register reg2 = new Register("reg2");
-        reg1.write(Tools.convertDecToBin32(number2));
-
-        reg1.print();
-        reg2.print();
-
-        System.out.println();
-
-        String res = Tools.binaryAddition32bit(reg1.read(), reg2.read());
-        System.out.println("res: " + res);
-    }
-
-    public static void TEST_binarySubtraction() {
-        System.out.println("TEST_binarySubtraction");
-        // number1 - number2
-        // Change numbers to test
-        int number1 = 64;
-        int number2 = 128;
-
-        Register reg1 = new Register("reg1");
-        reg1.write(Tools.convertDecToBin32(number1));
-        Register reg2 = new Register("reg2");
-        reg1.write(Tools.convertDecToBin32(number2));
-
-        reg1.print();
-        reg2.print();
-
-        System.out.println();
-
-        String res = Tools.binarySubtraction32bit(reg1.read(), reg2.read());
-        System.out.println(number1 + " - " + number2 + " = " + Tools.convertBin32ToDec(res) + String.format("(expected %d)", number1 - number2));
-        System.out.println("res: " + res);
+    public static boolean isNumberOfArgumentInvalid(boolean comparison, String line) {
+        if (comparison)
+            return true;
+        else {
+            System.out.println("Error: invalid number of argument:");
+            System.out.println("In line: " + line);
+            return false;
+        }
     }
 }
