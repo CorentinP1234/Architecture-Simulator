@@ -21,15 +21,11 @@ public class Register {
         for(int i = 0; i < 32; i++) {
            binaryString.append(bitArray[i]);
         }
-        int decimalValue = Integer.parseInt(String.valueOf(binaryString),2);
+        int decimalValue = Tools.convertBin32ToDec(binaryString.toString());
 
         // Print the register name and decimal value
-        System.out.println("Register " + registerName + " contains " + decimalValue + " :");
+        System.out.println("Register " + registerName + " contains " + decimalValue + " : " + binaryString.toString());
 
-        // Print each bit
-        for (int i = 0; i < 32; i++) {
-            System.out.print(bitArray[i]);
-        }
         System.out.print("\n");
     }
 

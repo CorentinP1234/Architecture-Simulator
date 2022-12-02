@@ -67,11 +67,18 @@ public class Main {
 
         return codeLines;
     }
-    public static void printVaraible(Memory memory) {
-        // Parcour le dic
-        // Regarde aux addresses
-        // bin to dec
-        // affiche les values
+    public static boolean printVaraible(String variable, Memory memory) {
+        String bin = memory.readFromName(variable);
+        if (Objects.equals(bin, "")) {
+            // no Var with this name
+            return true;
+        } else {
+            int decimalValue = Tools.convertBin32ToDec(bin);
+
+            System.out.println("VAR " + variable + " = " + decimalValue + " : " + bin + "\n");
+            return false;
+        }
+
     }
 
     public static void startExecution(ArrayList<String> codeLines, ALU alu, int PC, Memory memory) {
@@ -79,7 +86,7 @@ public class Main {
         boolean DATA_SECTION = false;
         boolean CODE_SECTION = false;
 
-        boolean prompt = true;
+        boolean allowCommands = true;
 
         while(lines_remaining) {
             String line = codeLines.get(PC);
@@ -87,41 +94,99 @@ public class Main {
             if (Objects.equals(line, "#CODE")) {
                 DATA_SECTION = false;
                 CODE_SECTION = true;
-                System.out.println("Data section finished");
-                System.out.println("Starting code section..");
+                memory.printAllVar();
+                System.out.println("Data section finished\n");
+                System.out.println("Starting code section..\n");
+                PC++;
+                continue;
             }
 
             if (DATA_SECTION) {
                 memory.writeVariableFromCodeLine(line);
             }
 
-            if (CODE_SECTION) {
+
+
+            if (CODE_SECTION && !Objects.equals(line, "HLT")) {
                 PC = code_section(line, alu, PC);
-                if (prompt) {
-                    alu.t0.print();
-                    alu.t1.print();
-                    alu.t2.print();
-                    alu.t3.print();
+                if (allowCommands) {
+                   allowCommands = promptCommands(line, alu);
                 }
             }
 
             if (Objects.equals(line, "#DATA")) {
                 System.out.println("Starting data section..");
+                memory.printAllVar();
                 DATA_SECTION = true;
             }
 
             // Stop condition
             if (Objects.equals(line, "HLT")) {
-                System.out.println("Code section finished");
+                System.out.println("> Code section finished\n");
+                memory.printAllVar();
+                promptCommands("", alu);
                 lines_remaining = false;
             }
+
             PC++;
         }
     }
 
-    //TODO
-    public static void printVariable() {
+    public static boolean promptCommands(String line, ALU alu) {
+        Scanner scanner = new Scanner(System.in);
+        boolean repeatPrompt = true;
+        do {
+            if (!Objects.equals(line, "")) {
+                System.out.print("> ");
+                System.out.println(line);
+            }
+            System.out.println("\nCommands: print <reg>, printVar <var>,memory <bits>, \"next\" or \"end\" to finish execution");
+            System.out.print(">>");
+            String input = scanner.nextLine();
+            System.out.println();
+            String[] lineElement = input.split(" ");
+            switch (lineElement[0]) {
 
+                case "print":
+                    Register reg = Tools.selectRegisterByName(lineElement[1], alu);
+                    if (reg == null) {
+                        System.out.println("Error: wrong register name:");
+                        System.out.println("Example: T0, T1, T2, T3");
+                    } else {
+                        reg.print();
+                    }
+                    break;
+
+                case "printVar":
+                    if (printVaraible(lineElement[1], alu.memory)) {
+                        System.out.println("Wrong variable name");
+                    }
+                    break;
+
+                case "memory":
+                    int numberOfBits;
+                    try {
+                        numberOfBits = Integer.parseInt(lineElement[1]);
+                        alu.memory.printBits(numberOfBits);
+                    }catch (Exception e) {
+                        System.out.println("Invalid number of bits");
+                    }
+                    break;
+
+                case "next":
+                case "n":
+                    repeatPrompt = false;
+                    break;
+
+                case "end":
+                    return false;
+
+                default:
+                    break;
+            }
+        } while (repeatPrompt);
+
+        return true;
     }
 
 
@@ -346,7 +411,7 @@ public class Main {
         String codeLine2 = "B 127";
         memory.writeVariableFromCodeLine(codeLine);
         memory.writeVariableFromCodeLine(codeLine2);
-        memory.print(100);
+        memory.printBits(100);
     }
     public static void TEST_twosComplement() {
         int numberToTest = 127;

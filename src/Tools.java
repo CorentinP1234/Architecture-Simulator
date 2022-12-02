@@ -162,19 +162,21 @@ public class Tools {
 
     public static Register selectRegisterByName(String registerName, ALU alu) {
         switch (registerName) {
+            case "t0":
             case "T0":
                 return alu.t0;
+            case "t1":
             case "T1":
                 return alu.t1;
+            case "t2":
             case "T2":
                 return alu.t2;
+            case "t3":
             case "T3":
                 return alu.t3;
             default:
-                System.out.println("Error: in selectRegisterByName: should not happen");
-                System.exit(0);
-                // For warning issues
-                return alu.t0;
+
+                return null;
         }
     }
 }

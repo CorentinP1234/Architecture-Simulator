@@ -52,7 +52,10 @@ public class Memory {
     }
 
     public String readFromName(String Name) {
-        int address = NameToAddressMap.get(Name);
+        int address = NameToAddressMap.getOrDefault(Name, -1);
+        if (address == -1) {
+            return "";
+        }
         return readFromAddress(address);
 
     }
@@ -76,22 +79,37 @@ public class Memory {
             byteArray[address + byteIndex][i%8] = binaryString.charAt(i);
         }
     }
-    public void print(int numberOfBits) {
+    public void printBits(int numberOfBits) {
         // Print memory
         int byteIndex = 0;
-        System.out.printf( "%2s: ", 1);
+        System.out.printf("%2d: ", 1);
         for (int i = 0; i < numberOfBits; i++) {
             System.out.print(byteArray[byteIndex][i%8] + " ");
             if(i%8 == 7) {
                 byteIndex++;
                 System.out.println();
-                System.out.printf("%2s: ", (byteIndex+1));
+                if (i != numberOfBits-1)
+                    System.out.printf("%2s: ", (byteIndex+1));
             }
 
         }
         System.out.println();
 
         // Print NameToAddressMap
+        System.out.println("Variable Addresses (in Bytes) : ");
         System.out.println(NameToAddressMap);
+        System.out.println();
+    }
+
+    public void printAllVar() {
+        for (Map.Entry<String, Integer> entry : NameToAddressMap.entrySet()) {
+            String varName = entry.getKey();
+            int address = entry.getValue();
+
+            String bin = readFromAddress(address);
+            int decimalValue = Tools.convertBin32ToDec(bin);
+            System.out.println("VAR " + varName + " = " + decimalValue);
+        }
+        System.out.println();
     }
 }
