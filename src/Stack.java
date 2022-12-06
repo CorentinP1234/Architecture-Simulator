@@ -23,7 +23,7 @@ public class Stack {
         }
 
         // Increment pointer
-        pointer += 32;
+        pointer += 4;
     }
     public String pop() {
         // Check if stack is empty
@@ -40,7 +40,7 @@ public class Stack {
                 byteIndex++;
         }
         // Decrement pointer
-        pointer -=32;
+        pointer -= 4;
 
         return binaryString.toString();
     }

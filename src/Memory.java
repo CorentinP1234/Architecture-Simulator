@@ -8,7 +8,7 @@ public class Memory {
     private int writingPointer = 0;
 
     // Give the address of a given variable
-    public final Map<String, Integer> NameToAddressMap = new HashMap<>();
+    public static final Map<String, Integer> NameToAddressMap = new HashMap<>();
 
     Memory() {
         // 8192 bytes Memory
@@ -27,7 +27,7 @@ public class Memory {
 
         // Check if variableName is a register name
         // If yes stop execution
-        if (Tools.isRegisterName(varName)) {
+        if (Register.isRegisterName(varName)) {
             System.out.println("Error: register name are reserved:");
             System.out.println("In line: " + codeLine);
             System.exit(1);
@@ -93,16 +93,17 @@ public class Memory {
         }
     }
 
-    public void printBits(int numberOfBits) {
+    public void print() {
+
         // Print memory
         int byteIndex = 0;
         System.out.printf("%2d: ", 1);
-        for (int i = 0; i < numberOfBits; i++) {
+        for (int i = 0; i < writingPointer * 8; i++) {
             System.out.print(byteArray[byteIndex][i%8] + " ");
             if(i%8 == 7) {
                 byteIndex++;
                 System.out.println();
-                if (i != numberOfBits-1)
+                if (i != ((writingPointer*8)-1))
                     System.out.printf("%2s: ", (byteIndex+1));
             }
 
@@ -121,13 +122,15 @@ public class Memory {
     }
 
     public void printAllVar() {
-        // Loop for all key and value
+
+        // Loop for each Varible and its address
         for (Map.Entry<String, Integer> entry : NameToAddressMap.entrySet()) {
             String varName = entry.getKey();
             int address = entry.getValue();
 
             String bin = readFromAddress(address);
             int decimalValue = Tools.convertBin32ToDec(bin);
+
             System.out.println("VAR " + varName + " = " + decimalValue);
         }
     }
@@ -142,5 +145,15 @@ public class Memory {
             System.out.println("VAR " + variable + " = " + decimalValue + " : " + bin + "\n");
         }
 
+    }
+
+    public static boolean isVarName(String param2) {
+        if(NameToAddressMap.containsKey(param2)) {
+                return true;
+        }
+        else {
+//
+            return false;
+        }
     }
 }

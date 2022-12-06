@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Register {
     int[] bitArray;
     String registerName;
@@ -41,6 +43,27 @@ public class Register {
         System.out.print("\n");
     }
 
+    public static boolean isRegisterName(String str) {
+        return Objects.equals(str, "T0") || Objects.equals(str, "T1")
+                || Objects.equals(str, "T2") || Objects.equals(str, "T3");
+    }
 
-
+    public static Register selectRegisterByName(String registerName, ALU alu) {
+        switch (registerName) {
+            case "t0":
+            case "T0":
+                return alu.t0;
+            case "t1":
+            case "T1":
+                return alu.t1;
+            case "t2":
+            case "T2":
+                return alu.t2;
+            case "t3":
+            case "T3":
+                return alu.t3;
+            default:
+                return null;
+        }
+    }
 }

@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.FileNameMap;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -39,29 +40,39 @@ public class FileReader {
     }
     public static String fileSelector() {
         boolean isInputValid = false;
-        String fileName = null;
+        String fileToExecute = null;
+
+        File project = new File(".");
+        File[] listOfFiles = project.listFiles();
+        assert listOfFiles != null;
+        int fileNumber;
+
+        ArrayList<String> assemblyFileName = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
 
         do {
             System.out.println("Which file do you want to run ?");
-            File project = new File(".");
-            File[] listOfFiles = project.listFiles();
-            ArrayList<String> assemblyFileName = new ArrayList<>();
+
+            int counter = 1;
             for (File file : listOfFiles) {
                 if (file.isFile()) {
-                    fileName = file.getName();
+                    String fileName = file.getName();
                     if (fileName.substring((fileName.length() - 3)).equals("txt")){
-                        String formattedFileName = fileName.substring(0, fileName.length() - 4);
-                        assemblyFileName.add(formattedFileName);
-                        System.out.println(formattedFileName);
+
+                        assemblyFileName.add(fileName);
+                        System.out.print(counter++ + ". ");
+                        System.out.println(fileName);
                     }
                 }
             }
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("\n> ");
-            String inputFile = scanner.nextLine();
-            if (assemblyFileName.contains(inputFile))
+            System.out.print("\nEnter a number: ");
+            fileNumber = scanner.nextInt();
+            if (fileNumber > 0 && fileNumber < (assemblyFileName.size() + 1)){
                 isInputValid = true;
+                fileToExecute = assemblyFileName.get(fileNumber - 1);
+            }
         } while(!isInputValid);
-        return fileName;
+        System.out.println();
+        return fileToExecute;
     }
 }

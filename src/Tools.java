@@ -3,6 +3,15 @@ import java.util.Objects;
 public class Tools {
     public static String convertDecToBin32(int decimalValue) {
 
+        // Check negative number
+        if (decimalValue < 0) {
+            int positive_value = decimalValue * -1;
+            String positiveBin = Integer.toBinaryString(positive_value);
+
+            String formattedBinary = String.format("%32s", positiveBin).replace(" ", "0");
+            return twosComplement(formattedBinary);
+        }
+
         // Convert decimal integer in binary string
         String binary = Integer.toBinaryString(decimalValue);
 
@@ -59,11 +68,35 @@ public class Tools {
         res.reverse();
         return res.toString();
     }
+
+//    public static String binaryAddition32bit(String binaryString1, String binaryString2) {
+//        int value1 = convertBin32ToDec(binaryString1);
+//        int value2 = convertBin32ToDec(binaryString2);
+//
+//        int res = value1 + value2;
+//        System.out.println(value1);
+//        System.out.println(value2);
+//        System.out.println(res);
+//        System.exit(1);
+//
+//        return convertDecToBin32(res);
+//    }
+
+//    public static String binarySubtraction32bit(String binaryString1, String binaryString2) {
+//        // binaryString1 - binaryString2
+//        String tmpString = twosComplement(binaryString2);
+//        String res = binaryAddition32bit(binaryString1, tmpString);
+//        return res;
+//    }
+
     public static String binarySubtraction32bit(String binaryString1, String binaryString2) {
         // binaryString1 - binaryString2
-        String tmpString = twosComplement(binaryString2);
-        String res = binaryAddition32bit(binaryString1, tmpString);
-        return res;
+        int value1 = convertBin32ToDec(binaryString1);
+        int value2 = convertBin32ToDec(binaryString2);
+
+        int res = value1 - value2;
+
+        return convertDecToBin32(res);
     }
 
     public static int convertBin32ToDec(String binaryString) {
@@ -134,10 +167,7 @@ public class Tools {
 
         return value1 < value2;
     }
-    public static boolean isRegisterName(String str) {
-        return Objects.equals(str, "T0") || Objects.equals(str, "T1")
-                || Objects.equals(str, "T2") || Objects.equals(str, "T3");
-    }
+
 
     public static boolean isNumeric(String str) {
         try {
@@ -148,34 +178,7 @@ public class Tools {
         }
     }
 
-    public static boolean isVariableInMemory(String param2, ALU alu) {
-        if(alu.memory.NameToAddressMap.containsKey(param2)) {
-                return true;
-        }
-        else {
-            System.out.println("Error: variable does not exist:");
-            System.out.println("Variable: " + param2);
-            System.exit(1);
-            return false;
-        }
-    }
 
-    public static Register selectRegisterByName(String registerName, ALU alu) {
-        switch (registerName) {
-            case "t0":
-            case "T0":
-                return alu.t0;
-            case "t1":
-            case "T1":
-                return alu.t1;
-            case "t2":
-            case "T2":
-                return alu.t2;
-            case "t3":
-            case "T3":
-                return alu.t3;
-            default:
-                return null;
-        }
-    }
+
+
 }

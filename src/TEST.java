@@ -59,6 +59,6 @@ public class TEST {
         String codeLine2 = "B 127";
         memory.writeFromCodeLine(codeLine);
         memory.writeFromCodeLine(codeLine2);
-        memory.printBits(100);
+        memory.print();
     }
 }

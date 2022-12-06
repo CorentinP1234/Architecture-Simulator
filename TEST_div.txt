@@ -1,0 +1,22 @@
+#DATA
+A 500
+B 500
+C 500
+#CODE
+! DIV <reg> <reg>
+LDA T0 A
+LDA T1 -5
+DIV T1 T0
+STR A T1
+LDA T1 0
+! DIV <reg> <const>
+LDA T1 -5
+DIV T1 500
+STR B T1
+LDA T1 0
+! DIV <reg> <var>
+LDA T1 -5
+DIV T1 C
+STR C T1
+! Expected result A = -100, B = -100, C = -100
+HLT

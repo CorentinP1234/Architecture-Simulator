@@ -1,17 +1,21 @@
-public class Instructions {
+public class Instruction {
+
     // 1. LDA <reg1> <reg2>/<var>/<const>
     public static void LDA(String param1, String param2, ALU alu) {
 
         Register reg1;
+
         // Select register (param1)
-        if (Tools.isRegisterName(param1)) {
+        if (Register.isRegisterName(param1)) {
 
-            reg1 = Tools.selectRegisterByName(param1, alu);
+            reg1 = Register.selectRegisterByName(param1, alu);
 
-            if (Tools.isRegisterName(param2)) {
-                Register reg2 = Tools.selectRegisterByName(param2, alu);
+            // Check if Second parameter is a Register
+            if (Register.isRegisterName(param2)) {
+                Register reg2 = Register.selectRegisterByName(param2, alu);
                 alu.LDA(reg1, reg2);
             }
+
             // Check if the Second parameter is a constant
             else if(Tools.isNumeric(param2)) {
                 int decimalConstant = Integer.parseInt(param2);
@@ -22,9 +26,14 @@ public class Instructions {
             else {
 
                 // Check if variable exists
-                if(Tools.isVariableInMemory(param2, alu)) {
+                if(Memory.isVarName(param2)) {
                     alu.LDA(reg1, param2);
                 }
+                else {
+                    System.out.println("Error: variable does not exist:");
+                    System.out.println("Variable: " + param2);
+                }
+
             }
         }
         else {
@@ -36,14 +45,16 @@ public class Instructions {
         // Check if the Second parameter is a register
 
     }
+
     // 2. STR <var> <reg>/<const>
     public static void STR(String param1, String param2, ALU alu) {
+
         // Check if param 1 is a variable
-        if(Tools.isVariableInMemory(param1, alu)) {
+        if(Memory.isVarName(param1)) {
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                Register reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                Register reg2 = Register.selectRegisterByName(param2, alu);
                 alu.STR(param1, reg2);
             }
 
@@ -65,8 +76,8 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if (Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if (Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
             alu.PUSH(reg1);
         }
 
@@ -77,7 +88,7 @@ public class Instructions {
         }
 
         // Check if param1 is a variable
-        else if (Tools.isVariableInMemory(param1, alu)) {
+        else if (Memory.isVarName(param1)) {
             alu.PUSH(param1);
         }
     }
@@ -86,8 +97,8 @@ public class Instructions {
         Register reg1;
 
         // Check if param1 is a register
-        if (Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if (Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
             alu.POP(reg1);
         }
         else {
@@ -103,12 +114,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 alu.AND(reg1, reg2);
             }
 
@@ -119,7 +130,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 alu.AND(reg1, param2);
             }
         }
@@ -137,12 +148,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 alu.OR(reg1, reg2);
             }
 
@@ -153,7 +164,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 alu.OR(reg1, param2);
             }
         }
@@ -168,8 +179,8 @@ public class Instructions {
     public static void NOT(String param1, ALU alu) {
         Register reg1;
 
-        if (Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if (Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
             alu.NOT(reg1);
         }
         else {
@@ -186,12 +197,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 alu.ADD(reg1, reg2);
             }
 
@@ -202,7 +213,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 alu.ADD(reg1, param2);
             }
         }
@@ -220,12 +231,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 alu.SUB(reg1, reg2);
             }
 
@@ -236,7 +247,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 alu.SUB(reg1, param2);
             }
         }
@@ -254,12 +265,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 alu.DIV(reg1, reg2);
             }
 
@@ -270,7 +281,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 alu.DIV(reg1, param2);
             }
         }
@@ -288,12 +299,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 alu.MUL(reg1, reg2);
             }
 
@@ -304,7 +315,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 alu.MUL(reg1, param2);
             }
         }
@@ -322,12 +333,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 alu.MOD(reg1, reg2);
             }
 
@@ -338,7 +349,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 alu.MOD(reg1, param2);
             }
         }
@@ -353,8 +364,8 @@ public class Instructions {
     public static void INC(String param1, ALU alu) {
         Register reg1;
 
-        if (Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if (Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
             alu.INC(reg1);
         }
         else {
@@ -368,8 +379,8 @@ public class Instructions {
     public static void DEC(String param1, ALU alu) {
         Register reg1;
 
-        if (Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if (Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
             alu.DEC(reg1);
         }
         else {
@@ -385,12 +396,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BEQ(reg1, reg2, LABEL, PC);
             }
 
@@ -401,7 +412,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BEQ(reg1, param2, LABEL, PC);
             }
         }
@@ -411,8 +422,8 @@ public class Instructions {
             decimalConstant = Integer.parseInt(param1);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BEQ(decimalConstant, reg2, LABEL, PC);
             }
 
@@ -423,17 +434,17 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BEQ(decimalConstant, param2, LABEL, PC);
             }
         }
 
         // Check if param1 is a variable
-        else if (Tools.isVariableInMemory(param1, alu)) {
+        else if (Memory.isVarName(param1)) {
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BEQ(param1, reg2, LABEL, PC);
             }
 
@@ -444,7 +455,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BEQ(param1, param2, LABEL, PC);
             }
         }
@@ -458,12 +469,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BNE(reg1, reg2, LABEL, PC);
             }
 
@@ -474,7 +485,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BNE(reg1, param2, LABEL, PC);
             }
         }
@@ -484,8 +495,8 @@ public class Instructions {
             decimalConstant = Integer.parseInt(param1);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BNE(decimalConstant, reg2, LABEL, PC);
             }
 
@@ -496,17 +507,17 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BNE(decimalConstant, param2, LABEL, PC);
             }
         }
 
         // Check if param1 is a variable
-        else if (Tools.isVariableInMemory(param1, alu)) {
+        else if (Memory.isVarName(param1)) {
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BNE(param1, reg2, LABEL, PC);
             }
 
@@ -517,7 +528,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BNE(param1, param2, LABEL, PC);
             }
         }
@@ -530,12 +541,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BBG(reg1, reg2, LABEL, PC);
             }
 
@@ -546,7 +557,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BBG(reg1, param2, LABEL, PC);
             }
         }
@@ -556,8 +567,8 @@ public class Instructions {
             decimalConstant = Integer.parseInt(param1);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BBG(decimalConstant, reg2, LABEL, PC);
             }
 
@@ -568,17 +579,17 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BBG(decimalConstant, param2, LABEL, PC);
             }
         }
 
         // Check if param1 is a variable
-        else if (Tools.isVariableInMemory(param1, alu)) {
+        else if (Memory.isVarName(param1)) {
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BBG(param1, reg2, LABEL, PC);
             }
 
@@ -589,7 +600,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BBG(param1, param2, LABEL, PC);
             }
         }
@@ -603,12 +614,12 @@ public class Instructions {
         int decimalConstant;
 
         // Check if param1 is a register
-        if(Tools.isRegisterName(param1)) {
-            reg1 = Tools.selectRegisterByName(param1, alu);
+        if(Register.isRegisterName(param1)) {
+            reg1 = Register.selectRegisterByName(param1, alu);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BSM(reg1, reg2, LABEL, PC);
             }
 
@@ -619,7 +630,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BSM(reg1, param2, LABEL, PC);
             }
         }
@@ -629,8 +640,8 @@ public class Instructions {
             decimalConstant = Integer.parseInt(param1);
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BSM(decimalConstant, reg2, LABEL, PC);
             }
 
@@ -641,17 +652,17 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BSM(decimalConstant, param2, LABEL, PC);
             }
         }
 
         // Check if param1 is a variable
-        else if (Tools.isVariableInMemory(param1, alu)) {
+        else if (Memory.isVarName(param1)) {
 
             // Check if param2 is a register
-            if (Tools.isRegisterName(param2)) {
-                reg2 = Tools.selectRegisterByName(param2, alu);
+            if (Register.isRegisterName(param2)) {
+                reg2 = Register.selectRegisterByName(param2, alu);
                 return alu.BSM(param1, reg2, LABEL, PC);
             }
 
@@ -662,7 +673,7 @@ public class Instructions {
             }
 
             // Check if param2 is a variable
-            else  if (Tools.isVariableInMemory(param2, alu)) {
+            else  if (Memory.isVarName(param2)) {
                 return alu.BSM(param1, param2, LABEL, PC);
             }
         }

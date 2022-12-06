@@ -1,0 +1,22 @@
+#DATA
+A 100
+B 100
+C 100
+#CODE
+! MUL <reg> <reg>
+LDA T0 A
+LDA T1 -5
+MUL T1 T0
+STR A T1
+LDA T1 0
+! MUL <reg> <const>
+LDA T1 -5
+MUL T1 100
+STR B T1
+LDA T1 0
+! MUL <reg> <var>
+LDA T1 -5
+MUL T1 C
+STR C T1
+! Expected result A = -500, B = -500, C = -500
+HLT

@@ -13,10 +13,10 @@ public class ALU {
 
     public Map<String, Integer> labelToCodeLine = new HashMap<>();
     ALU() {
-        this.t0 = new Register("t0");
-        this.t1 = new Register("t1");
-        this.t2 = new Register("t2");
-        this.t3 = new Register("t3");
+        this.t0 = new Register("T0");
+        this.t1 = new Register("T1");
+        this.t2 = new Register("T2");
+        this.t3 = new Register("T3");
     }
 
     // 1. LDA <reg1> <reg2>/<var>/<const>
@@ -25,8 +25,9 @@ public class ALU {
 
     public void LDA(Register reg1, Register reg2) {
 
+        reg1.write(reg2.read());
         // Copy each bit of reg2 into reg1
-        System.arraycopy(reg1.bitArray, 0, reg2.bitArray, 0, 32);
+//        System.arraycopy(reg1.bitArray, 0, reg2.bitArray, 0, 32);
     }
 
     public void LDA(Register reg1, int constant) {
@@ -280,6 +281,7 @@ public class ALU {
         // Write in register 1
         reg1.write(result);
     }
+
     // 10. DIV <reg1> <reg2>/<var>/<const>
     //    Performs the integer division operation of reg1 and a register reg2, a variable var or a constant
     //    const, and store the result on register reg1. The operation is given by second argument divided by
@@ -287,12 +289,15 @@ public class ALU {
     //    instance) are NOT ALLOWED.
 
     public void DIV(Register reg1, Register reg2) {
+
         // Get decimal values from registers
         int value1 = Tools.convertBin32ToDec(reg1.read());
         int value2 = Tools.convertBin32ToDec(reg2.read());
 
+
         // Integer division
         int result = value2 / value1;
+
 
         // Convert result in binary
         String binResult = Tools.convertDecToBin32(result);
