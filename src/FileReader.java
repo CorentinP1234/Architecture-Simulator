@@ -1,6 +1,5 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.FileNameMap;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -44,7 +43,10 @@ public class FileReader {
 
         File project = new File(".");
         File[] listOfFiles = project.listFiles();
-        assert listOfFiles != null;
+        if (listOfFiles == null) {
+            System.out.println("Error no file found");
+            System.exit(1);
+        }
         int fileNumber;
 
         ArrayList<String> assemblyFileName = new ArrayList<>();

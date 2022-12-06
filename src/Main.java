@@ -4,9 +4,10 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+    static final Scanner scan = new Scanner(System.in);
     public static void main(String[] args) throws FileNotFoundException {
         //TODO
-        // SUB to working
+        // SUB to work
 
         // file selector
         String fileToRun = FileReader.fileSelector();
@@ -25,7 +26,7 @@ public class Main {
 
         // Comment est implemente la Stack ?
         // Voir: - Stack.bitArray
-//               - Stack.push()
+        //       - Stack.push()
         //       - Stack.pop()
 
         // Comment est implemente la memoire ?
@@ -35,7 +36,7 @@ public class Main {
 
         // Comment sont implemente les registres ?
         // Voir: - Register.bitArray
-//         Register.write()
+        // Register.write()
         //       - Register.read()
     }
 
@@ -73,7 +74,7 @@ public class Main {
                 // Read instruction
                 PC = parseInstructions(line, alu, PC);
 
-                // Check if prompt has been disable
+                // Check if prompt has been disabled
                 if (commandPrompt) {
 
                     // Read command
@@ -101,24 +102,28 @@ public class Main {
     }
 
     public static boolean promptCommands(String line, ALU alu) {
-        Scanner scanner = new Scanner(System.in);
         boolean repeatPrompt = true;
+        boolean showCommandAndCodeLine = true;
 
         // Repeat prompt printing until "next" or "end" command
         do {
 
-            // Print the code line above the prompt
-            if (!Objects.equals(line, "")) {
-                System.out.print("> ");
-                System.out.println(line);
-            }
 
-            // Print prompt
-            System.out.println("\nCommands: print <reg/var>, print memory, next or end");
+
+            if (showCommandAndCodeLine){
+                if (!Objects.equals(line, "")) {
+                    System.out.print("> ");
+                    // Print the code line above the prompt
+                    System.out.println(line);
+                }
+                // Print prompt
+                System.out.println("\nCommands: print <reg>/<var>, print memory/stack, next or end");
+                showCommandAndCodeLine = false;
+            }
             System.out.print(">>");
 
             // Take the command
-            String input = scanner.nextLine();
+            String input = scan.nextLine();
             System.out.println();
 
             // Split the command by word
@@ -143,6 +148,7 @@ public class Main {
                             System.out.println("Example: T0, T1, T2, T3\n");
                         }
                     }
+
                     // print <var>
                     else if (Memory.isVarName(argument)){
                         try {
@@ -153,10 +159,17 @@ public class Main {
                             System.out.println("Wrong variable name");
                         }
                     }
-                    // print <memory>
+
+                    // print memory
                     else if (Objects.equals(argument, "memory")) {
                         alu.memory.print();
                     }
+
+                    // print stack
+                    else if (Objects.equals(argument, "stack")) {
+                        alu.stack.print();
+                    }
+
                     else {
                         System.out.println("Invalid command\n");
                     }

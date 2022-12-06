@@ -689,7 +689,7 @@ public class ALU {
     // 17. BBG <reg1>/<var1>/<const1> <reg2>/<var2>/<const2> <LABEL>
     //    Performs a comparison between two values, given by registers, variables or constants. Any
     //    combination is permitted. If the first parameter is bigger than the second parameter, jump to the
-    //    address defined by the label LABEL
+    //    address defined by the LABEL
 
     // Register as first parameter
     public int BBG(Register reg1, Register reg2, String LABEL, int PC) {
@@ -804,7 +804,7 @@ public class ALU {
     // 18. BSM <reg1>/<var1>/<const1> <reg2>/<var2>/<const2> <LABEL>
     //    Performs a comparison between two values, given by registers, variables or constants. Any
     //    combination is permitted. If the first parameter is smaller than the second parameter, jump to the
-    //    address defined by the label LABEL
+    //    address defined by the LABEL
 
     // Register as first parameter
     public int BSM(Register reg1, Register reg2, String LABEL, int PC) {
@@ -916,7 +916,7 @@ public class ALU {
     }
 
     // 19. JMP <LABEL>
-    //    Jump to the address defined by the label LABEL
+    //    Jump to the address defined by the LABEL
 
     // assign to PC the label line number
     public int JMP(String label) {

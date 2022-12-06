@@ -123,7 +123,7 @@ public class Memory {
 
     public void printAllVar() {
 
-        // Loop for each Varible and its address
+        // Loop for each Variable and its address
         for (Map.Entry<String, Integer> entry : NameToAddressMap.entrySet()) {
             String varName = entry.getKey();
             int address = entry.getValue();
@@ -148,12 +148,6 @@ public class Memory {
     }
 
     public static boolean isVarName(String param2) {
-        if(NameToAddressMap.containsKey(param2)) {
-                return true;
-        }
-        else {
-//
-            return false;
-        }
+        return NameToAddressMap.containsKey(param2);
     }
 }

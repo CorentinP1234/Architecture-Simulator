@@ -63,7 +63,9 @@ public class Register {
             case "T3":
                 return alu.t3;
             default:
-                return null;
+                // For warning issues
+                System.out.println("Error in selectRegisterByName: should not be printed");
+                return alu.t0;
         }
     }
 }

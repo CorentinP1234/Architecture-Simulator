@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 public class Tools {
     public static String convertDecToBin32(int decimalValue) {
 
@@ -15,79 +13,48 @@ public class Tools {
         // Convert decimal integer in binary string
         String binary = Integer.toBinaryString(decimalValue);
 
-        // Get a 32-bit format by adding 0 before the first significant bit
-        String formattedBinary = String.format("%32s", binary).replace(" ", "0");
-
-        return formattedBinary;
+        // Return a 32-bit format by adding 0 before the first significant bit
+        return String.format("%32s", binary).replace(" ", "0");
     }
-    public static String twosComplement(String binaryString) {
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(binaryString);
+    public static String twosComplement(String bin) {
 
-        // One's complement (flip each bit)
-        for(int i = 0; i < 32; i++) {
-            stringBuilder.setCharAt(i, flip(stringBuilder.charAt(i)));
+        StringBuilder stringBuilder = new StringBuilder(bin);
+
+        // Traverse the string to get first '1' from the last of string
+        int i;
+        for (i = 31; i >=0; i--) {
+            if (bin.charAt(i) == '1')
+                break;
+        }
+        // If there exists no '1' concatenate 1 at the starting of the string
+        if (i == -1) {
+            return bin;
         }
 
-        // Add one to get the two's complement
-        String twosComplement = binaryAddition32bit(stringBuilder.toString(), "00000000000000000000000000000001");
+        // Continue traversal after the position of first '1'
+        for (int k = i-1; k >= 0; k--) {
+            // flip the values
+            if (stringBuilder.charAt(k) == '1')
+                stringBuilder.setCharAt(k, '0');
+            else
+                stringBuilder.setCharAt(k, '1');
 
-        return twosComplement;
+        }
+
+        return stringBuilder.toString();
     }
-    public static char flip(char c) {
-        if (c == '0')
-            return '1';
-        else
-            return '0';
-    }
+
+
 
     public static String binaryAddition32bit(String binaryString1, String binaryString2) {
-        StringBuilder res = new StringBuilder();
+        int value1 = convertBin32ToDec(binaryString1);
+        int value2 = convertBin32ToDec(binaryString2);
 
-        int carry = 0;
-        int bit1;
-        int bit2;
-        int bit3;
-        for(int i = 0; i < 32; i++) {
-            bit1 = Character.getNumericValue(binaryString1.charAt(31-i));
-            bit2 = Character.getNumericValue(binaryString2.charAt(31-i));
-            bit3 = bit1 + bit2 + carry;
-            if (bit3 == 2) {
-                bit3 = 0;
-                carry = 1;
-            } else if (bit3 == 3) {
-                bit3 = 1;
-                carry = 1;
-            }
-            else {
-                carry = 0;
-            }
-            res.append(Character.forDigit(bit3, 10));
-        }
-        res.reverse();
-        return res.toString();
+        int res = value1 + value2;
+
+        return convertDecToBin32(res);
     }
-
-//    public static String binaryAddition32bit(String binaryString1, String binaryString2) {
-//        int value1 = convertBin32ToDec(binaryString1);
-//        int value2 = convertBin32ToDec(binaryString2);
-//
-//        int res = value1 + value2;
-//        System.out.println(value1);
-//        System.out.println(value2);
-//        System.out.println(res);
-//        System.exit(1);
-//
-//        return convertDecToBin32(res);
-//    }
-
-//    public static String binarySubtraction32bit(String binaryString1, String binaryString2) {
-//        // binaryString1 - binaryString2
-//        String tmpString = twosComplement(binaryString2);
-//        String res = binaryAddition32bit(binaryString1, tmpString);
-//        return res;
-//    }
 
     public static String binarySubtraction32bit(String binaryString1, String binaryString2) {
         // binaryString1 - binaryString2
