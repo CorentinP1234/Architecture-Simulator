@@ -4,102 +4,123 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
+    static Screen screen;
     static final Scanner scan = new Scanner(System.in);
+    static boolean testBool = true;
+
     public static void main(String[] args) throws FileNotFoundException {
         //TODO
-        // SUB to work
+        // SUB might not work
 
-        // file selector
         String fileToRun = FileReader.fileSelector();
         ArrayList<String> codeLines = FileReader.readFile_withoutComments(fileToRun);
-
-        // Manual file selection
-//         ArrayList<String> codeLines = FileReader.readFile_withoutComments("TEST_mul.txt");
 
         ALU alu = new ALU();
         alu.memory = new Memory();
         alu.stack = new Stack();
 
-        int PC = 0;
+        startExecution(codeLines, alu);
 
-        startExecution(codeLines, alu, PC);
+        // How is implemented the Stack ?
+        // See first: - Stack.bitArray
+        //            - Stack.push()
+        //            - Stack.pop()
 
-        // Comment est implemente la Stack ?
-        // Voir: - Stack.bitArray
-        //       - Stack.push()
-        //       - Stack.pop()
+        // How is implemented the Memory ?
+        // See first: - Memory.byteArray
+        //            - Memory.writeFromCodeLine()
+        //            - Memory.readFromName()
 
-        // Comment est implemente la memoire ?
-        // Voir: - Memory.byteArray
-        //       - Memory.writeFromCodeLine()
-        //       - Memory.readFromName()
-
-        // Comment sont implemente les registres ?
-        // Voir: - Register.bitArray
-        // Register.write()
-        //       - Register.read()
+        // How is implemented the Registers ?
+        // See first: - Register.bitArray
+        //            - Register.write()
+        //            - Register.read()
     }
 
-    public static void startExecution(ArrayList<String> codeLines, ALU alu, int PC) {
-        boolean lines_remaining = true;
-        boolean DATA_SECTION = false;
-        boolean CODE_SECTION = false;
-
-        boolean commandPrompt = true;
-
-        while(lines_remaining) {
-
-            // Fetch line corresponding to the PC
-            String line = codeLines.get(PC);
-
-            // Enter #CODE section and print all variable from #DATA section
-            if (Objects.equals(line, "#CODE")) {
-                DATA_SECTION = false;
-                CODE_SECTION = true;
-                alu.memory.printAllVar();
-                System.out.println("#DATA section finished\n");
-                System.out.println("Starting #CODE section..");
-                PC++;
-                continue;
-            }
-
-            // When in #DATA section, write variable in memory
-            if (DATA_SECTION) {
-                alu.memory.writeFromCodeLine(line);
-            }
-
-            // When in #CODE section, perform the instruction and print the command prompt
-            if (CODE_SECTION && !Objects.equals(line, "HLT")) {
-
-                // Read instruction
-                PC = parseInstructions(line, alu, PC);
-
-                // Check if prompt has been disabled
-                if (commandPrompt) {
-
-                    // Read command
-                    commandPrompt = promptCommands(line, alu);
-                }
-            }
-
-            // Enter #DATA section
-            if (Objects.equals(line, "#DATA")) {
-                System.out.println("Starting #DATA section..");
-                DATA_SECTION = true;
-            }
-
-            // Stop execution when instruction HLT is found, print the command prompt
-            if (Objects.equals(line, "HLT")) {
-                System.out.println("> HLT\n");
-                alu.memory.printAllVar();
-                promptCommands("", alu);
-                lines_remaining = false;
-            }
-
-            // Increment PC after each instruction
-            PC++;
+    public static void readDataSection(ArrayList<String> dataSection, Memory memory) {
+        for (String line : dataSection) {
+            memory.writeFromLine(line);
         }
     }
+
+    public static void readCodeSection(ArrayList<String> codeSection, ALU alu) {
+        boolean commandPrompt = true;
+        int PC = 0;
+
+        // Fetch line corresponding to the PC
+        String  currentLine = codeSection.get(PC);
+
+        while (!Objects.equals(currentLine, "HLT")) {
+
+            // Read instruction
+            PC = parseInstructions(currentLine, alu, PC);
+
+            // Don't show the command prompt if "end" command was used
+            if (commandPrompt)
+                // Print the prompt and do the command entered
+                // Return false if the command is "end"
+                commandPrompt = promptCommands(currentLine, alu);
+
+            // Update the PC
+            PC++;
+            currentLine = codeSection.get(PC);
+        }
+
+        System.out.println("> HLT\n");
+        alu.memory.printAllVar();
+
+        // User can enter command after the execution to check the state of all type of memory
+        promptCommands("", alu);
+    }
+
+    public static int stepExecution(ArrayList<String> codeLines, ALU alu, int PC) {
+        String currentLine = codeLines.get(PC);
+        boolean isLastInstruction = Objects.equals(currentLine, "HLT");
+
+        if (!Objects.equals(currentLine, "HLT")) {
+            PC = parseInstructions(currentLine, alu, PC);
+            PC++;
+            if (testBool){
+                testBool = promptCommands(currentLine, alu);
+            }
+        }
+
+        if (isLastInstruction) {
+            System.out.println("> HLT\n");
+            alu.memory.printAllVar();
+            // User can enter command after the execution to check the state of all type of memory
+            promptCommands("", alu);
+            return -1;
+        }
+        else
+            return PC;
+    }
+    public static void simulate(ArrayList<String> codeLines, ALU alu) {
+        int PC = 0;
+        // If PC is set to -1 it means that stepExecution has read "HLT"
+        while(PC != -1) {
+            PC = stepExecution(codeLines, alu, PC);
+        }
+    }
+
+
+     public static void startExecution(ArrayList<String> codeLines, ALU alu) {
+
+        System.out.println("Starting Data section..\n");
+        ArrayList<String> dataSection = FileReader.getDataSection(codeLines);
+        readDataSection(dataSection, alu.memory);
+        alu.memory.printAllVar();
+        System.out.println("\nDATA section finished\n");
+
+        System.out.println("Starting CODE section..\n");
+        ArrayList<String> codeSection = FileReader.getCodeSection(codeLines);
+//        readCodeSection(codeSection, alu);
+         simulate(codeSection, alu);
+        System.out.println("CODE section finished\n");
+    }
+
+
+
 
     public static boolean promptCommands(String line, ALU alu) {
         boolean repeatPrompt = true;
@@ -107,9 +128,6 @@ public class Main {
 
         // Repeat prompt printing until "next" or "end" command
         do {
-
-
-
             if (showCommandAndCodeLine){
                 if (!Objects.equals(line, "")) {
                     System.out.print("> ");

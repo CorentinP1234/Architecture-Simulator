@@ -1,4 +1,67 @@
 public class TEST {
+
+    // Archive
+//        public static void oldStartExecution(ArrayList<String> codeLines, ALU alu, int PC) {
+//        boolean lines_remaining = true;
+//        boolean DATA_SECTION = false;
+//        boolean CODE_SECTION = false;
+//        boolean commandPrompt = true;
+//
+//        while(lines_remaining) {
+//
+//            // Fetch line corresponding to the PC
+//            String line = codeLines.get(PC);
+//
+//            // Enter #CODE section and print all variable from #DATA section
+//            if (Objects.equals(line, "#CODE")) {
+//                DATA_SECTION = false;
+//                CODE_SECTION = true;
+//                alu.memory.printAllVar();
+//                System.out.println("#DATA section finished\n");
+//                System.out.println("Starting #CODE section..");
+//                PC++;
+//                continue;
+//            }
+//
+//            // When in #DATA section, write variable in memory
+//            if (DATA_SECTION) {
+//                alu.memory.writeFromLine(line);
+//            }
+//
+//            // When in #CODE section, perform the instruction and print the command prompt
+//            if (CODE_SECTION && !Objects.equals(line, "HLT")) {
+//
+//                // Read instruction
+//                PC = parseInstructions(line, alu, PC);
+//
+//                // Check if prompt has been disabled
+//                if (commandPrompt) {
+//
+//                    // Read command
+//                    commandPrompt = promptCommands(line, alu);
+//                }
+//            }
+//
+//            // Enter #DATA section
+//            if (Objects.equals(line, "#DATA")) {
+//                System.out.println("Starting #DATA section..");
+//                DATA_SECTION = true;
+//            }
+//
+//            // Stop execution when instruction HLT is found, print the command prompt
+//            if (Objects.equals(line, "HLT")) {
+//                System.out.println("> HLT\n");
+//                alu.memory.printAllVar();
+//                promptCommands("", alu);
+//                lines_remaining = false;
+//            }
+//
+//            // Increment PC after each instruction
+//            PC++;
+//        }
+//    }
+    // -------------------------------------------
+
     public static void TEST_binaryAddition() {
         System.out.println("TEST_binaryAddition");
         // number1 + number2
@@ -57,8 +120,8 @@ public class TEST {
         Memory memory = new Memory();
         String codeLine = "A 10";
         String codeLine2 = "B 127";
-        memory.writeFromCodeLine(codeLine);
-        memory.writeFromCodeLine(codeLine2);
+        memory.writeFromLine(codeLine);
+        memory.writeFromLine(codeLine2);
         memory.print();
     }
 }

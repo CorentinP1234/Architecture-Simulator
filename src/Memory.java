@@ -8,14 +8,14 @@ public class Memory {
     private int writingPointer = 0;
 
     // Give the address of a given variable
-    public static final Map<String, Integer> NameToAddressMap = new HashMap<>();
+    public static Map<String, Integer> NameToAddressMap = new HashMap<>();
 
     Memory() {
         // 8192 bytes Memory
         this.byteArray = new int[8192][8];
     }
 
-    public void writeFromCodeLine(String codeLine) {
+    public void writeFromLine(String codeLine) {
 
         // Extract variable name and value from the code line
         String[] elements = codeLine.split(" ");
@@ -58,6 +58,7 @@ public class Memory {
         // Get address of the variable, if there is no such variable return an empty string
         int address = NameToAddressMap.getOrDefault(varName, -1);
         if (address == -1) {
+            System.out.println("Error readFromName: no variable found");
             return "";
         }
         // Return the binary representation of the variable
@@ -118,7 +119,9 @@ public class Memory {
             System.out.println(Name + " stored at " + (address + 1));
         }
         System.out.println();
+        printAllVar();
         System.out.println();
+
     }
 
     public void printAllVar() {
@@ -134,6 +137,20 @@ public class Memory {
             System.out.println("VAR " + varName + " = " + decimalValue);
         }
     }
+    public String getAllVar() {
+        StringBuilder res = new StringBuilder();
+        // Loop for each Variable and its address
+        for (Map.Entry<String, Integer> entry : NameToAddressMap.entrySet()) {
+            String varName = entry.getKey();
+            int address = entry.getValue();
+
+            String bin = readFromAddress(address);
+            int decimalValue = Tools.convertBin32ToDec(bin);
+
+            res.append(varName).append(" = ").append(decimalValue).append("\n");
+        }
+        return res.toString();
+    }
 
     public void printVariable(String variable) {
         String bin = readFromName(variable);
@@ -144,7 +161,6 @@ public class Memory {
 
             System.out.println("VAR " + variable + " = " + decimalValue + " : " + bin + "\n");
         }
-
     }
 
     public static boolean isVarName(String param2) {

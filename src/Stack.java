@@ -79,8 +79,35 @@ public class Stack {
             }
             System.out.println("Pointer: " + pointer);
             System.out.println();
+            System.out.println("TODO : print numbers");
+            System.out.println(getInfo());
+            System.out.println();
         }
+    }
+    public String getInfo() {
+        StringBuilder res = new StringBuilder();
 
+        int tmpPointer = pointer;
+        while((tmpPointer - 4) > 0) {
+            res.append(getNumber(tmpPointer));
+            res.append(" ");
+            tmpPointer -= 4;
+        }
+        return res.toString();
+    }
+    public int getNumber(int pointer) {
+        if (pointer == 0) {
+            System.out.println("Error getNumber: stack is empty");
+            System.exit(1);
+        }
+        StringBuilder number = new StringBuilder();
+        int byteIndex = 0;
+        for (int i = (pointer-4) * 8; i < pointer * 8; i++) {
+            number.append(byteArray[byteIndex][i%8]);
+             if(i%8 == 7)
+                byteIndex++;
+        }
+        return Tools.convertBin32ToDec(number.toString());
     }
 }
 

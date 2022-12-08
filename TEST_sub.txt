@@ -1,0 +1,17 @@
+#DATA
+A 100
+B 100
+C 100
+D 100
+#CODE
+! arg1 pos arg2 pos
+LDA T0 90
+SUB T0 T1
+STR A T0
+! arg1 pos arg2 neg
+LDA T0
+! arg1 neg arg2 pos
+! arg1 neg arg2 neg
+
+
+HLT

@@ -77,4 +77,29 @@ public class FileReader {
         System.out.println();
         return fileToExecute;
     }
+    public static ArrayList<String> getDataSection(ArrayList<String> lines) {
+        ArrayList<String> dataSection = new ArrayList<String>();
+        for (String line : lines) {
+            if (Objects.equals(line, "#DATA")) {
+                continue;
+            }
+            if (Objects.equals(line, "#CODE"))
+                break;
+            dataSection.add(line);
+        }
+        return dataSection;
+    }
+    public static ArrayList<String> getCodeSection(ArrayList<String> lines) {
+        ArrayList<String> codeSection = new ArrayList<String>();
+        boolean isCodeSection = false;
+        for (String line : lines) {
+            if (Objects.equals(line, "#CODE")) {
+                isCodeSection = true;
+                continue;
+            }
+            if (isCodeSection)
+                codeSection.add(line);
+        }
+        return codeSection;
+    }
 }
