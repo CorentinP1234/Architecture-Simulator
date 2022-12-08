@@ -27,7 +27,9 @@
             <children>
               <component id="c5927" class="javax.swing.JTextPane" binding="codeText">
                 <constraints/>
-                <properties/>
+                <properties>
+                  <editable value="false"/>
+                </properties>
               </component>
             </children>
           </scrollpane>
@@ -184,7 +186,9 @@
                         <preferred-size width="150" height="50"/>
                       </grid>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <editable value="false"/>
+                    </properties>
                   </component>
                   <component id="665a2" class="javax.swing.JLabel">
                     <constraints>
@@ -201,6 +205,7 @@
                       </grid>
                     </constraints>
                     <properties>
+                      <editable value="false"/>
                       <text value=""/>
                     </properties>
                   </component>

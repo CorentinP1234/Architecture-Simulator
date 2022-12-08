@@ -36,12 +36,6 @@ public class Screen extends JFrame{
     ArrayList<String> lines;
     ArrayList<String> codeLines;
     int PC;
-    boolean lines_remaining = true;
-    boolean DATA_SECTION = false;
-    boolean CODE_SECTION = false;
-    boolean isStepByStep = true;
-    boolean stepByStep = false;
-    boolean simulate = false;
     boolean commandPrompt = false;
 
     public static void main(String[] args) {
@@ -66,61 +60,57 @@ public class Screen extends JFrame{
         loadFileButton.setText("Load File");
         simulateButton.setText("Simulate");
         stepSimulationButton.setText("Step Simulation");
-        stackText.setText("TODO print Numbers");
 
-        loadFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser dialogue = new JFileChooser("./");
+        loadFileButton.addActionListener(e -> {
+            JFileChooser dialogue = new JFileChooser("./");
 
-                dialogue.showOpenDialog(null);
+            dialogue.showOpenDialog(null);
 
-                file =  dialogue.getSelectedFile();
-                fileName.setText(" " + file.getName());
+            file =  dialogue.getSelectedFile();
+            fileName.setText(" " + file.getName());
 
-                try {
-                    lines = FileReader.readFile_withoutComments(file.getName());
-                } catch (FileNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                }
-
-                alu = new ALU();
-                alu.stack = new Stack();
-                alu.memory = new Memory();
-                Memory.NameToAddressMap = new HashMap<>();
-                PC = 0;
-
-                memoryText.setText(getDataLines(lines, alu.memory));
-                codeText.setText(getCodeLines(lines));
+            try {
+                lines = FileReader.readFile_withoutComments(file.getName());
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
             }
+
+            alu = new ALU();
+            alu.stack = new Stack();
+            alu.memory = new Memory();
+            Memory.NameToAddressMap = new HashMap<>();
+            PC = 0;
+
+            memoryText.setText(getDataLines(lines, alu.memory));
+            codeText.setText(getCodeLines(lines));
         });
 
-        simulateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<String> codeLines = FileReader.getCodeSection(lines);
-                readCodeSection(codeLines, alu);
+        simulateButton.addActionListener(e -> {
+            ArrayList<String> codeLines = FileReader.getCodeSection(lines);
+            // If PC is set to -1 it means that stepExecution has read "HLT"
+            while (PC != -1) {
+                PC = Main.stepExecution(codeLines, alu, PC, false);
+            }
+//                readCodeSection(codeLines, alu);
+            update(alu);
+        });
+
+        stepSimulationButton.addActionListener(e -> {
+            if (PC != -1){
+                 PC = stepExecution(codeLines, alu, PC);
                 update(alu);
-            }
-        });
-
-        stepSimulationButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (PC != -1){
-                     PC = stepExecution(codeLines, alu, PC);
-                    update(alu);
-                }
             }
         });
     }
 
-    public static int stepExecution(ArrayList<String> codeLines, ALU alu, int PC) {
+     public static int stepExecution(ArrayList<String> codeLines, ALU alu, int PC) {
+        if (PC == -1)
+            return -1;
         String currentLine = codeLines.get(PC);
         boolean isLastInstruction = Objects.equals(currentLine, "HLT");
 
         if (!Objects.equals(currentLine, "HLT")) {
-            PC = Main.parseInstructions(currentLine, alu, PC);
+            PC = Instruction.parseInstructions(currentLine, alu, PC);
             PC++;
         }
 
@@ -130,28 +120,13 @@ public class Screen extends JFrame{
         else
             return PC;
     }
-    public void readCodeSection(ArrayList<String> codeSection, ALU alu) {
-        boolean commandPrompt = true;
-        PC = 0;
-
-        // Fetch line corresponding to the PC
-        String  currentLine = codeSection.get(PC);
-
-        while (!Objects.equals(currentLine, "HLT")) {
-
-            // Read instruction
-            PC = Main.parseInstructions(currentLine, alu, PC);
-
-            // Update the PC
-            PC++;
-            currentLine = codeSection.get(PC);
-        }
-    }
 
     public void update(ALU alu) {
-        alu.memory.printAllVar();
         memoryText.setText(alu.memory.getAllVar());
-        nextInstruction.setText(codeLines.get(PC));
+        if (PC != -1)
+            nextInstruction.setText(codeLines.get(PC));
+        else
+            nextInstruction.setText("HLT");
         stackText.setText(alu.stack.getInfo());
         t0Label.setText("T0 : " + Tools.convertBin32ToDec(alu.t0.read()));
         t1Label.setText("T1 : " + Tools.convertBin32ToDec(alu.t1.read()));

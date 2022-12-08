@@ -78,7 +78,7 @@ public class FileReader {
         return fileToExecute;
     }
     public static ArrayList<String> getDataSection(ArrayList<String> lines) {
-        ArrayList<String> dataSection = new ArrayList<String>();
+        ArrayList<String> dataSection = new ArrayList<>();
         for (String line : lines) {
             if (Objects.equals(line, "#DATA")) {
                 continue;
@@ -90,7 +90,7 @@ public class FileReader {
         return dataSection;
     }
     public static ArrayList<String> getCodeSection(ArrayList<String> lines) {
-        ArrayList<String> codeSection = new ArrayList<String>();
+        ArrayList<String> codeSection = new ArrayList<>();
         boolean isCodeSection = false;
         for (String line : lines) {
             if (Objects.equals(line, "#CODE")) {

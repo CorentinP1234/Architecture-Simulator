@@ -1,5 +1,135 @@
 public class Instruction {
 
+    public static int parseInstructions(String line, ALU alu, int PC) {
+        String[] lineElements = line.split(" ");
+        int numberOfArgument = lineElements.length - 1;
+
+        // Check for label
+        if (numberOfArgument == 0) {
+
+            // Label example : "LOOP:"
+            int labelLength = lineElements[0].length();
+
+            // Remove ":" at the end
+            String label = lineElements[0].substring(0, labelLength-1);
+
+            // Store in Map
+            alu.labelToCodeLine.put(label, PC);
+        }
+
+        String instruction = lineElements[0];
+
+
+        switch (instruction) {
+            case "LDA":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.LDA(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "STR":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.STR(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "PUSH":
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
+                    Instruction.PUSH(lineElements[1], alu);
+                break;
+
+            case "POP":
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
+                    Instruction.POP(lineElements[1], alu);
+                break;
+
+            case "AND":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.AND(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "OR":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.OR(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "NOT":
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
+                    Instruction.NOT(lineElements[1], alu);
+                break;
+
+            case "ADD":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.ADD(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "SUB":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.SUB(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "DIV":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.DIV(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "MUL":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.MUL(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "MOD":
+                if (isNumberOfArgumentValid((numberOfArgument == 2), line))
+                    Instruction.MOD(lineElements[1], lineElements[2], alu);
+                break;
+
+            case "INC":
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
+                    Instruction.INC(lineElements[1], alu);
+                break;
+
+            case "DEC":
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line))
+                    Instruction.DEC(lineElements[1], alu);
+                break;
+
+            case "BEQ":
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
+                    return Instruction.BEQ(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                break;
+
+            case "BNE":
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
+                    return Instruction.BNE(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                break;
+
+            case "BBG":
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
+                    return Instruction.BBG(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                break;
+
+            case "BSM":
+                if (isNumberOfArgumentValid((numberOfArgument == 3), line))
+                    return Instruction.BSM(lineElements[1], lineElements[2], lineElements[3], PC, alu);
+                break;
+
+            case "JMP":
+                if (isNumberOfArgumentValid((numberOfArgument == 1), line)) {
+                    return Instruction.JMP(lineElements[1], alu);
+                }
+                break;
+        }
+        return PC;
+    }
+
+    public static boolean isNumberOfArgumentValid(boolean comparison, String line) {
+        if (comparison)
+            return true;
+        else {
+            System.out.println("\nError: invalid number of argument:");
+            System.out.println("In line: " + line);
+            System.exit(1);
+            return false;
+        }
+    }
     // 1. LDA <reg1> <reg2>/<var>/<const>
     public static void LDA(String param1, String param2, ALU alu) {
 

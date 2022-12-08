@@ -1,4 +1,3 @@
-
 public class Stack {
     public int[][] byteArray;
     public int pointer = 0;
@@ -61,8 +60,6 @@ public class Stack {
                         System.out.printf("%2s: ", (byteIndex+1));
                 }
             }
-            System.out.println("Pointer: " + pointer);
-            System.out.println();
         }
         else  {
             int byteIndex = 0;
@@ -77,24 +74,27 @@ public class Stack {
                 }
 
             }
-            System.out.println("Pointer: " + pointer);
-            System.out.println();
-            System.out.println("TODO : print numbers");
-            System.out.println(getInfo());
-            System.out.println();
         }
+        System.out.println("Writing Pointer: " + pointer);
+        System.out.println();
+        System.out.println(getInfo());
+        System.out.println();
     }
     public String getInfo() {
         StringBuilder res = new StringBuilder();
 
-        int tmpPointer = pointer;
-        while((tmpPointer - 4) > 0) {
-            res.append(getNumber(tmpPointer));
-            res.append(" ");
-            tmpPointer -= 4;
+        int tmpPointer = 4;
+        while(tmpPointer != pointer + 4) {
+            int number = getNumber(tmpPointer);
+            res.append(number);
+            res.append("->");
+            tmpPointer += 4;
         }
-        return res.toString();
+        if (res.length() == 0)
+            return "";
+        return res.substring(0, res.length()-2);
     }
+
     public int getNumber(int pointer) {
         if (pointer == 0) {
             System.out.println("Error getNumber: stack is empty");
@@ -103,7 +103,8 @@ public class Stack {
         StringBuilder number = new StringBuilder();
         int byteIndex = 0;
         for (int i = (pointer-4) * 8; i < pointer * 8; i++) {
-            number.append(byteArray[byteIndex][i%8]);
+            int bit = byteArray[pointer-4 + byteIndex][i%8];
+            number.append(bit);
              if(i%8 == 7)
                 byteIndex++;
         }
