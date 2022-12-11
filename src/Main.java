@@ -47,9 +47,16 @@ public class Main {
         }
     }
 
-    public static int stepExecution(ArrayList<String> codeLines, ALU alu, int PC, boolean commandPrompt) {
-        if (PC == -1)
-            return -1;
+    public static Object[] stepExecution(ArrayList<String> codeLines, ALU alu, int PC, boolean commandPrompt) {
+
+        // Stop execution (last instruction was HLT)
+        if (PC == -1) {
+            Object[] res = new Object[2];
+            res[0] = -1;
+            res[1] = commandPrompt;
+            return res;
+        }
+
         String currentLine = codeLines.get(PC);
         boolean isLastInstruction = Objects.equals(currentLine, "HLT");
 
@@ -67,17 +74,29 @@ public class Main {
             // User can enter command after the execution to check the state of all type of memory
             if (commandPrompt)
                 promptCommands("", alu);
-            return -1;
+
+            Object[] res = new Object[2];
+            res[0] = -1;
+            res[1] = commandPrompt;
+            // PC = -1
+            return res;
         }
-        else
-            return PC;
+        else {
+            Object[] res = new Object[2];
+            res[0] = PC;
+            res[1] = commandPrompt;
+            return res;
+        }
     }
 
     public static void simulate(ArrayList<String> codeLines, ALU alu, boolean commandPrompt) {
+        Object[] res;
         int PC = 0;
         // If PC is set to -1 it means that stepExecution has read "HLT"
         while(PC != -1) {
-            PC = stepExecution(codeLines, alu, PC, commandPrompt);
+            res = stepExecution(codeLines, alu, PC, commandPrompt);
+            PC = (int) res[0];
+            commandPrompt = (boolean) res[1];
         }
     }
 

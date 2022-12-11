@@ -27,7 +27,7 @@ public class Tools {
             if (bin.charAt(i) == '1')
                 break;
         }
-        // If there exists no '1' concatenate 1 at the starting of the string
+
         if (i == -1) {
             return bin;
         }
@@ -144,8 +144,5 @@ public class Tools {
             return false;
         }
     }
-
-
-
 
 }

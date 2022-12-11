@@ -86,12 +86,14 @@ public class Screen extends JFrame{
         });
 
         simulateButton.addActionListener(e -> {
+            Object[] res;
             ArrayList<String> codeLines = FileReader.getCodeSection(lines);
             // If PC is set to -1 it means that stepExecution has read "HLT"
             while (PC != -1) {
-                PC = Main.stepExecution(codeLines, alu, PC, false);
+
+                res = Main.stepExecution(codeLines, alu, PC, false);
+                PC = (int) res[0];
             }
-//                readCodeSection(codeLines, alu);
             update(alu);
         });
 
