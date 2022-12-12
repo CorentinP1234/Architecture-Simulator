@@ -68,7 +68,7 @@ public class FileReader {
                 }
             }
             System.out.print("\nEnter a number: ");
-            fileNumber = scanner.nextInt();
+            fileNumber = Integer.parseInt(scanner.nextLine());
             if (fileNumber > 0 && fileNumber < (assemblyFileName.size() + 1)){
                 isInputValid = true;
                 fileToExecute = assemblyFileName.get(fileNumber - 1);

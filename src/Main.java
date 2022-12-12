@@ -5,24 +5,28 @@ import java.util.Scanner;
 
 public class Main {
     static final Scanner scan = new Scanner(System.in);
+    static boolean lastPrompt;
 
     public static void main(String[] args) throws FileNotFoundException {
-        //TODO
-        // SUB might not work
         if (GUISelector()){
             // GUI
             Screen.main(args);
         }
         else {
             // Terminal
-            String fileToRun = FileReader.fileSelector();
-            ArrayList<String> codeLines = FileReader.readFile_withoutComments(fileToRun);
+            while(true) {
+                String fileToRun = FileReader.fileSelector();
+                ArrayList<String> codeLines = FileReader.readFile_withoutComments(fileToRun);
 
-            ALU alu = new ALU();
-            alu.memory = new Memory();
-            alu.stack = new Stack();
+                ALU alu = new ALU();
+                alu.memory = new Memory();
+                alu.stack = new Stack();
 
-            startExecutionTerminal(codeLines, alu);
+                startExecutionTerminal(codeLines, alu);
+                System.out.println();
+                System.out.println("Press Enter to continue:");
+                scan.nextLine();
+            }
         }
 
         // How is implemented the Stack ?
@@ -72,7 +76,7 @@ public class Main {
             System.out.println("> HLT\n");
             alu.memory.printAllVar();
             // User can enter command after the execution to check the state of all type of memory
-            if (commandPrompt)
+            if (lastPrompt)
                 promptCommands("", alu);
 
             Object[] res = new Object[2];
@@ -90,6 +94,7 @@ public class Main {
     }
 
     public static void simulate(ArrayList<String> codeLines, ALU alu, boolean commandPrompt) {
+        lastPrompt = commandPrompt;
         Object[] res;
         int PC = 0;
         // If PC is set to -1 it means that stepExecution has read "HLT"
@@ -215,13 +220,14 @@ public class Main {
                 System.out.println("Choose:");
                 System.out.println("1. GUI");
                 System.out.println("2. Terminal");
-                selection = scan.nextInt();
+                selection = Integer.parseInt(scan.nextLine());
                 if (selection == 1 || selection == 2)
                     isInputValid = false;
             } catch (Exception e){
                 System.out.println("Invalid input !");
             }
         }while (isInputValid);
+        System.out.println();
         return selection == 1;
     }
 }
